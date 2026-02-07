@@ -1,61 +1,46 @@
 #include "sort.h"
 
 /**
- * swap_nodes - Swaps a node with its previous node in a doubly linked list
- * @list: Double pointer to the head of the list
- * @node: Pointer to the node to be swapped
- */
-
-void swap_nodes(listint_t **list, listint_t *node)
-{
-	listint_t *prev = node->prev, *next = node->next;
-
-	if (prev->prev)
-	{
-		prev->prev->next = node;
-	}
-	else
-	{
-		*list = node;
-	}
-
-	node->prev = prev->prev;
-	node->next = prev;
-	prev->prev = node;
-	prev->next = next;
-
-	if (next)
-	{
-		next->prev = prev;
-	}
-}
-
-/**
  * insertion_sort_list - Sorts a doubly linked list of integers
- *                        in ascending order using the Insertion sort algorithm
- * @list: Double pointer to the head of the list
+ *                       in ascending order using Insertion sort
+ * @list: Pointer to the head of the list
  */
-
 void insertion_sort_list(listint_t **list)
 {
-	listint_t *cur, *ins;
+	listint_t *current, *insert, *tmp;
 
-	if (!list || !*list || !(*list)->next)
-	{
+	if (list == NULL || *list == NULL || (*list)->next == NULL)
 		return;
-	}
 
-	cur = (*list)->next;
+	current = (*list)->next;
 
-	while (cur)
+	while (current)
 	{
-		ins = cur;
-		cur = cur->next;
+		tmp = current->next;
+		insert = current->prev;
 
-		while (ins->prev && ins->n < ins->prev->n)
+		while (insert && current->n < insert->n)
 		{
-			swap_nodes(list, ins);
+			/* Detach current */
+			insert->next = current->next;
+			if (current->next)
+				current->next->prev = insert;
+
+			/* Move current before insert */
+			current->prev = insert->prev;
+			current->next = insert;
+
+			if (insert->prev)
+				insert->prev->next = current;
+			else
+				*list = current;
+
+			insert->prev = current;
+
 			print_list(*list);
+			insert = current->prev;
 		}
+		current = tmp;
 	}
 }
+
